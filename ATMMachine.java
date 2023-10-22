@@ -5,8 +5,6 @@ public class ATMMachine {
 	Account cur;
 	ATMMachine(String bankName){
 		bank = new Bank(bankName);
-		cur = new Account("You", "", 123456, 0);
-		bank.accounts.put(123456, cur);
 		panel();
 		
 	}
@@ -15,14 +13,28 @@ public class ATMMachine {
 		Scanner in = new Scanner(System.in);
 		
 		int response=1;
-		System.out.println("Enter ID (123456):");
-		if(!bank.accounts.containsKey(in.nextInt())) {
+		
+		cur = addAccount();
+			
+		
+		System.out.println("To Access Account please enter ID:");
+		while(cur.getId() != in.nextInt()) {
 			System.out.println("Sorry Account not found!");
-			System.exit(0);
+			System.out.print("Enter again: ");
+			
 		}
+		System.out.println("Enter password: ");
+		in.nextLine();
+		while(!in.nextLine().equals(cur.getPassword())) {
+			System.out.println("Wrong password!");
+			System.out.print("Enter again: ");
+			
+		}
+		
 		
 		while(response != -1)
 		{
+			System.out.println();
 			System.out.println("Would would you like to do?");
 				
 			System.out.println("1) Deposit");
@@ -53,26 +65,25 @@ public class ATMMachine {
 	
 			}
 			else if(response ==4) {
-				System.out.println("Enter the ID of the account you'd like to transfer: ");
-				int id = in.nextInt();
 				System.out.println("Enter the amount you would like to transfer: ");
 				double amt = in.nextDouble();
-				transfer(cur, bank.accounts.get(id), amt);
+				cur.withdraw(amt);
 			}
 			else if(response ==5) {
 				addAccount();
 			}
+			System.out.println();
 			
 		}
 		System.out.println("Thank you for connecting with us!");
 		
 		
 	}
-	public void addAccount() {
+	public Account addAccount() {
 		Account acc = new Account();
 		
 		Scanner in = new Scanner(System.in);
-		int response = in.nextInt();
+		
 		System.out.println("Welcome New Customer. To add a new account please give the following:");
 		
 		System.out.print("First Name: ");
@@ -81,6 +92,10 @@ public class ATMMachine {
 		
 		System.out.print("Last Name: ");
 		acc.setLastName(in.next());
+		System.out.println();
+		
+		System.out.print("Password: ");
+		acc.setPassword(in.next());
 		System.out.println();
 		
 		int bankingID = (int)(Math.random()*9999999);
@@ -95,9 +110,7 @@ public class ATMMachine {
 		acc.deposit(in.nextDouble());
 		
 		bank.accounts.put(acc.getId(), acc);
+		return acc;
 	}
-	public void transfer(Account main, Account other, double amt) {
-		main.withdraw(amt);
-		other.deposit(amt);
-	}
+	
 }
